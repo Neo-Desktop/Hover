@@ -1,0 +1,111 @@
+# Checks and tests the server, builds it for every system, makes the release build (tools/build),
+# checks the result and uploads it. A tag such as v1.0.0 also publishes it as a GitHub release.
+# See README, "Continuous integration".
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: |
+            server/go.sum
+            tools/build/go.sum
+
+      - name: Check and test the server
+        working-directory: server
+        run: |
+          test -z "$(gofmt -l *.go)" || { gofmt -l *.go; echo "run gofmt on the files above"; exit 1; }
+          go vet ./...
+          go test ./...
+
+      - name: Check the build tool
+        working-directory: tools/build
+        run: |
+          test -z "$(gofmt -l .)" || { gofmt -l .; echo "run gofmt on the files above"; exit 1; }
+          go vet ./...
+
+      - name: Build the server for every system
+        working-directory: server
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          set -e
+          mkdir -p ../out/hover
+          for target in windows/amd64 darwin/amd64 darwin/arm64 linux/amd64 linux/arm64; do
+            os=${target%/*}; arch=${target#*/}
+            name=hover-server-$os-$arch
+            [ "$os" = windows ] && name=$name.exe
+            GOOS=$os GOARCH=$arch go build -trimpath -ldflags="-s -w" -o ../out/hover/$name .
+          done
+          ls -l ../out/hover
+
+      - name: Make the release build
+        working-directory: tools/build
+        run: go run . -out ../../out/hover/dist
+
+      - name: Check the release build
+        run: |
+          set -e
+          cd out/hover/dist
+          ls -l
+          test -f index.html
+          for kind in script.*.js style.*.css assets.*.pack; do
+            set -- $kind
+            [ $# -eq 1 ] && [ -f "$1" ] || { echo "expected one $kind"; exit 1; }
+            grep -q "$1" index.html || { echo "index.html doesn't name $1"; exit 1; }
+          done
+          cd ../../..
+          # Start the server on the release build and check what it sends.
+          cp index.html out/hover/
+          mkdir -p out/hover/scripts && cp scripts/mazes.js out/hover/scripts/
+          (cd out/hover && exec ./hover-server-linux-amd64 -dist -addr 127.0.0.1:8080 -scores "$RUNNER_TEMP/scores.json") &
+          server=$!
+          trap 'kill $server' EXIT
+          for i in $(seq 30); do curl -fs -o /dev/null http://127.0.0.1:8080/ && break; sleep 1; done
+          curl -fsS -D - -o /dev/null http://127.0.0.1:8080/ | tee headers.txt
+          grep -qi "^cache-control: no-cache" headers.txt
+          script=$(cd out/hover/dist && ls script.*.js)
+          curl -fsS -H "Accept-Encoding: gzip" -D - -o /dev/null "http://127.0.0.1:8080/$script" | tee headers.txt
+          grep -qi "^cache-control: public, max-age=31536000, immutable" headers.txt
+          grep -qi "^content-encoding: gzip" headers.txt
+          rm headers.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hover-release
+          path: out/hover
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: hover-release
+          path: hover
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          chmod +x hover/hover-server-*
+          zip -qr "hover-${GITHUB_REF_NAME}.zip" hover
+          gh release create "$GITHUB_REF_NAME" "hover-${GITHUB_REF_NAME}.zip" --repo "$GITHUB_REPOSITORY" --title "Hover! $GITHUB_REF_NAME" --generate-notes

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>Hover!</title>
+    <link rel="shortcut icon" type="image/ico" href="Images/ui/favicon.ceb3714b.ico">
+    <meta name="description" content="Hover is Back – Internet Explorer 11 brings the classic Windows 95 capture-the-flag game to the web with brand new 3D graphics and touch gameplay.">
+    <meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width"/>
+    <link rel="canonical" href="http://hover.ie/">
+
+    <!--
+        Readable-source edition: every file below is served from this folder by the Go server
+        (server/). The original page loaded the same things, minified, from
+        http://mshovercdn.blob.core.windows.net/ and http://rethinkbar.azurewebsites.net/; copies of
+        those originals are in scripts/original/.
+    -->
+    <link href="css/game.css" rel="stylesheet" type="text/css">
+    <link href="css/classic-menu.css" rel="stylesheet" type="text/css">
+
+    <meta property="og:image" content="Images/ui/hoverfb.png"/>
+    <meta property="og:title" content="Hover! by Internet Explorer"/>
+    <meta property="og:site_name" content="Hover! by Internet Explorer"/>
+    <meta property="og:url" content="http://hover.ie/"/>
+    <meta property="og:description" content="Hover is Back – Internet Explorer 11 brings the classic Windows 95 capture-the-flag game to the web with brand new 3D graphics and touch gameplay."/>
+
+    <meta name="application-name" content="Hover!"/>
+    <meta name="msapplication-TileColor" content="#170D18"/>
+    <meta name="msapplication-TileImage" content="Images/ui/favicon-144.4919f19a.png"/>
+    <meta name="msapplication-square70x70logo" content="Images/ui/favicon-144.4919f19a.png"/>
+    <meta name="msapplication-square150x150logo" content="Images/ui/tile270.d481f440.png"/>
+    <meta name="msapplication-wide310x150logo" content="Images/ui/tilewide.6d09eb85.png"/>
+    <meta name="msapplication-square310x310logo" content="Images/ui/tile558.d74d366d.jpg"/>
+</head>
+<body>
+    <div id="main-bg"></div>
+    <div id="background">
+        <canvas id="starsCanvas"></canvas>
+        <div class="lightaccent lightaccent-topleft"></div>
+        <div class="lightaccent lightaccent-bottomleft"></div>
+        <div class="lightaccent lightaccent-topright"></div>
+        <div class="lightaccent lightaccent-bottomright"></div>
+        <div class="spotaccent spotaccent-topleft"></div>
+        <div class="spotaccent spotaccent-center"></div>
+        <div id="linesaccent"></div>
+    </div>
+    <div id="main"></div>
+    <div id="dd"></div>
+
+    <!-- This edition: the source of this rebuild, in place of the 2013 site's Microsoft footer. -->
+    <ul id="footer">
+        <li><a class="footerLink footerGithub" href="https://github.com/Neo-Desktop/hover" target="_blank" rel="noopener" title="Hover! on GitHub"><!-- GitHub mark: Octicons "mark-github" (MIT licence, GitHub, Inc.) --><svg class="footerGithubMark" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Neo-Desktop/hover</a></li>
+    </ul>
+
+
+    <!--
+        The release build (tools/build; README, "Release build") combines and shrinks the scripts
+        and style sheets listed here, in this order, into dist/. src/pack.js comes first: there it
+        loads the game's pictures and sounds from one file; here it does nothing.
+    -->
+    <script src="src/pack.js"></script>
+
+    <!-- Third-party libraries, readable versions (see src/vendor/README.md). Order matters. -->
+    <script src="src/vendor/jquery-1.10.2.js"></script>
+    <!-- What the original bundled as scripts/game-libs.js -->
+    <script src="src/vendor/typedarray.js"></script>
+    <script src="src/vendor/modernizr-2.6.2.js"></script>
+    <script src="src/vendor/yepnope-1.5.4.js"></script>
+    <script src="src/vendor/modernizr.load.js"></script>
+    <script src="src/vendor/detectizr-1.4.4.js"></script>
+    <script src="src/vendor/underscore-1.5.1.js"></script>
+    <script src="src/vendor/backbone-1.0.0.js"></script>
+    <script src="src/vendor/purl-2.2.1.js"></script>
+    <script src="src/vendor/PxLoader.js"></script>
+    <script src="src/vendor/PxLoaderImage.js"></script>
+    <script src="src/vendor/PxLoaderSound.js"></script>
+    <script src="src/vendor/PxLoaderVideo.js"></script>
+    <script src="src/vendor/jquery.pxtouch.js"></script>
+    <script src="src/vendor/jquery.signalR-2.0.3.js"></script>
+    <script src="src/vendor/jquery.easing-1.3.js"></script>
+    <script src="src/vendor/jquery.fadeInLetters.js"></script>
+    <!-- three.js r61 with Hover's small patches (marked "HOVER PATCH") -->
+    <script src="src/vendor/three-r61.js"></script>
+
+    <!-- Game data: the three mazes and their texture schemes -->
+    <script src="scripts/mazes.js"></script>
+    <script src="scripts/small-maze.js"></script>
+    <!-- Which image and sound files to load -->
+    <script src="src/assets.js"></script>
+
+    <!-- The game itself, readable (src/game/). Files load in numeric order. -->
+    <script src="src/game/00-namespace.js"></script>
+    <script src="src/game/01-util.js"></script>
+    <script src="src/game/02-geometry.js"></script>
+    <script src="src/game/03-craft.js"></script>
+    <script src="src/game/04-ai-and-input.js"></script>
+    <script src="src/game/05-hud.js"></script>
+    <script src="src/game/06-maze.js"></script>
+    <script src="src/game/07-pods.js"></script>
+    <script src="src/game/08-world.js"></script>
+    <script src="src/game/09-data.js"></script>
+    <script src="src/game/10-render.js"></script>
+    <script src="src/game/11-game.js"></script>
+    <script src="src/game/12-multiplayer.js"></script>
+    <script src="src/game/13-pads-and-beacons.js"></script>
+    <script src="src/game/14-audio.js"></script>
+    <script src="src/game/15-weapons.js"></script>
+    <script src="src/game/16-templates.js"></script>
+    <script src="src/game/17-settings.js"></script>
+    <script src="src/game/18-viewer3d.js"></script>
+    <script src="src/game/19-views-background.js"></script>
+    <script src="src/game/19-views-customize.js"></script>
+    <script src="src/game/19-views-game-message.js"></script>
+    <script src="src/game/19-views-game.js"></script>
+    <script src="src/game/19-views-home.js"></script>
+    <script src="src/game/19-views-iepanel.js"></script>
+    <script src="src/game/19-views-loading.js"></script>
+    <script src="src/game/19-views-multiplayer.js"></script>
+    <script src="src/game/19-views-scoreboard.js"></script>
+    <script src="src/game/19-views-set-local-game.js"></script>
+    <script src="src/game/19-views-single-player.js"></script>
+    <script src="src/game/19-views-upgrade.js"></script>
+    <script src="src/game/20-app.js"></script>
+    <!-- Added in this edition: scale the game window to fit the screen -->
+    <script src="src/game/21-fit-to-screen.js"></script>
+    <!-- Added in this edition: the Windows 95 menu bar of classic mode -->
+    <script src="src/game/22-classic-menu.js"></script>
+    <script src="src/game/23-main-menu-level.js"></script>
+    <script src="src/game/24-classic-robots.js"></script>
+
+    <script>
+        // The "About the site" panel plays a YouTube video; this loads YouTube's player API
+        // (the only thing the page still fetches from the internet).
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    </script>
+</body>
+</html>

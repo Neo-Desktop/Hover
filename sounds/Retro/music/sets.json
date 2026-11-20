@@ -1,0 +1,4 @@
+{
+    "comment": "Recordings of the 1995 MIDI songs in this folder (classic mode: Options > Sounds > Music Played On). Each is a subfolder with MUSIC1-3.m4a and .ogg; generaluser is the files directly in this folder. tools/render-music.sh adds sets and updates this list.",
+    "recorded": ["windows", "sc88", "generaluser", "soundblaster", "ess", "mt32"]
+}

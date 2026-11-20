@@ -1,0 +1,16 @@
+# The release build (made by tools/build; see README, "Release build").
+/dist/
+
+# Server programs you build yourself, and the high scores, player records and signing key the
+# server keeps while it runs (server/data/ by default).
+/server/bin/
+/server/data/
+
+# Your own sound banks and MT-32 ROMs, used to record the music sets (README, "Music recordings").
+# They are copyrighted, so they stay out of the repository; the recordings made with them are in.
+/mt32roms/
+*.sf2
+*.dls
+
+# Files Windows adds to downloads.
+*:Zone.Identifier

@@ -1,0 +1,67 @@
+
+    
+<!-- create -->
+<div class="mpCreate contentArea">
+    <h2 class="mpTitle">Create a Game</h2>
+    <h3 class="mpPrompt">Choose the number of players and we’ll create a unique link for your game.</h3>
+    <div class="mpCreateOptions">
+        <div class="mpPlayerMeter">
+            <div class="mpPlayerMeterBg"></div>
+            <div class="mpPlayerMeterFg"></div>
+            <div class="mpPlayerMeterHover"></div>
+        </div>
+        <div class="mpPlayerCount">2</div>
+        <div class="mpPlayerCountLabel">
+            <span class="mpTotalPlayers">Players</span><br>
+            <span class="mpPlayersPerTeam">One</span> Per Team
+        </div>
+        <div class="createButton">Create</div>    </div>
+</div>
+
+<!-- link -->
+<div class="mpLink contentArea">
+    <h2 class="mpTitle">Share this Link</h2>
+    <h3 class="mpPrompt">Share this link with your friends so they can join. Then, enter the game.</h3>
+    <div class="mpLinkOptions">
+        <h4 class="mpLinkOptionsTitle">Game Link</h4>
+        <p class="mpLinkOptionsSubtitle">(Click to Select, Ctrl-C to Copy)</p>
+        <input id="gameLink" type="text" readonly="readonly" >
+        <div class="enterButton">Enter</div>
+    </div>
+</div>
+
+<!-- craft -->
+<div class="craft"></div>
+<div class="mpCraft contentArea">
+    <h2 class="mpTitle">Join the Battle</h2>
+    <h3 class="mpPrompt">Choose a craft, enter your name and then join the game.</h3>
+    <div class="craftDrag"></div>
+    <div class="leftChooserButton">Previous</div>
+    <div class="rightChooserButton">Next</div>
+    <div class="simpleForm">
+        <input type="text"class="simpleFormTextBox" id="nameTextBox" 
+            placeholder="Enter Your Name" maxlength="15" />
+        <div id="joinButton" class="simpleFormButton">Join</div>
+    </div>
+</div>
+
+<!-- wait -->
+<div class="mpWait contentArea">
+    <h2 class="mpTitle">Waiting for Players</h2>
+    <h3 class="mpPrompt">We're waiting for everyone to join before the battle begins.</h3>
+
+    <div class="mpLinkOptions">
+        <input id="waitLink" type="text" readonly="readonly" >
+        <div class="mpRadar">
+            <div class="mpRadarOver"></div>
+        </div>
+        <ul class="playerNames">
+        </ul>
+    </div>
+
+    <div class="mpError"></div>
+</div>
+
+
+
+ 

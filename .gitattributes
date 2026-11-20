@@ -1,0 +1,17 @@
+# Text files keep Unix line endings in the repository and on every checkout (the shell scripts must
+# run in WSL, Linux and macOS); pictures, models' textures, fonts and sounds are never changed.
+* text=auto eol=lf
+
+*.png  binary
+*.jpg  binary
+*.gif  binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.eot  binary
+*.m4a  binary
+*.ogg  binary
+*.mid  binary
+*.WAV  binary
+*.wav  binary

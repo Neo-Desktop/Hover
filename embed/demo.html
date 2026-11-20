@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Hover! embed demo</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            max-width: 980px;
+            margin: 32px auto;
+            padding: 0 16px;
+            color: #222
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 12px;
+            overflow: auto
+        }
+
+        .game {
+            margin: 16px 0 40px
+        }
+    </style>
+</head>
+<body>
+    <h1>Hover! on another page</h1>
+    <p>A page embeds the game with one script tag and a marked element:</p>
+    <pre>&lt;script src="https://your-hover-host/embed/hover-embed.js" async&gt;&lt;/script&gt;
+&lt;div data-hover-game data-mode="classic" data-difficulty="expert"&gt;&lt;/div&gt;</pre>
+
+    <h2>Classic (Windows 95), Expert</h2>
+    <div class="game" data-hover-game data-mode="classic" data-difficulty="expert" data-width="760px"></div>
+
+    <h2>Modern (2013 3D look)</h2>
+    <div class="game" data-hover-game data-mode="modern"></div>
+
+    <script src="hover-embed.js" async></script>
+</body>
+</html>

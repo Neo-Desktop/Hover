@@ -1,0 +1,68 @@
+<div id="iePanelOverlay"></div>
+
+<div id="ieTab">
+	<div id="ieTabTouchTarget"></div>
+	<div id="ieTabLogo"></div>
+	<div id="ieTabArrow"></div>
+	<div id="ieTabLearnMore"></div>
+</div>
+
+<div id="iePanel">
+	
+	<div id="iePanelHeader">
+		<div id="iePanelHeaderLogo"></div>
+		<h3 id="iePanelHeaderTagLine">
+			<%- data.headerMessage1 %><br><%- data.headerMessage2 %>
+		</h3>
+		<a href="<%= data.headerMoreLink %>" id="iePanelHeaderButton" target="_blank">
+			Learn More
+		</a>
+	</div>
+	
+	<div id="iePanelTabs">
+		<div id="iePanelTabAbout" class="iePanelTab selected">About the Site</div>
+		<div id="iePanelTabTechnology" class="iePanelTab">Technology</div>
+	</div>
+	
+	<div id="iePanelContents">
+		
+		<div id="iePanelContentAbout" class="iePanelContent">
+			<div id="iePanelContentVideo">
+				<img id="iePanelContentVideoThumb" src="http://img.youtube.com/vi/<%= data.videoId %>/maxresdefault.jpg" />
+				<div id="iePanelContentVideoPlay"></div>
+			</div>
+			<div class="ieReadable">
+				<p><%- data.aboutMessage %></p>
+				<p><%= data.aboutDan1 %></p>
+				<p><%= data.aboutDan2 %></p>
+			</div>
+		</div>
+		
+		<div id="iePanelContentTechnology" class="iePanelContent">
+			<div id="iePanelContentTechnologyBadges">
+				<a href="http://www.modern.ie/en-us/category/hover-ie" target="_blank" class="iePanelTechBadge ieTechBadge3d"></a>
+				<a href="http://msdn.microsoft.com/en-us/library/ie/bg142799(v=vs.85).aspx" target="_blank"  class="iePanelTechBadge ieTechBadgeOffline"></a>
+				<a href="http://msdn.microsoft.com/en-us/library/ie/bg124103(v=vs.85).aspx" target="_blank"  class="iePanelTechBadge ieTechBadgeCss3"></a>
+				<a href="http://msdn.microsoft.com/library/ie/hh673567.aspx" target="_blank"  class="iePanelTechBadge ieTechBadgeConnectivity"></a>
+			</div>
+			<div class="ieReadable">
+				<p><%= data.techMessage %></p>
+			</div>
+			<a id="iePanelBehindScenes" target="_blank" href="<%= data.techMoreLink %>">Behind the Scenes</a>
+		</div>
+	</div>
+	
+	<div id="iePanelClose">
+		<div id="iePanelCloseIcon"></div>
+	</div>
+
+</div>
+
+<div id="ieVideo">
+	<div id="ieVideoOverlay"><div>
+	<div id="ieVideoContent">
+		<img id="ieVideoThumb" src="http://img.youtube.com/vi/<%= data.videoId %>/maxresdefault.jpg" />
+		<div id="ieVideoFrame"></div>
+		<div id="ieVideoClose"></div>
+	</div>
+</div>

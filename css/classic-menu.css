@@ -1,0 +1,907 @@
+/*
+ * Added in this edition: the Windows 95 menu bar and dialog boxes of classic mode
+ * (src/game/22-classic-menu.js). They use the Windows 95 menu font, MS Sans Serif at 8 point
+ * (11 px), as a pixel web font (fonts/ms-sans-serif/, MIT licence from 98.css). Everything sits inside the classic game window (#gameContainer,
+ * 808 x 652 px, scaled to the screen), whose artwork has the menu bar between y = 24 and y = 46.
+ */
+
+@font-face {
+    font-family: "Hover MS Sans Serif";
+    src: url(../fonts/ms-sans-serif/ms_sans_serif.woff2) format("woff2"), url(../fonts/ms-sans-serif/ms_sans_serif.woff) format("woff");
+    font-weight: normal;
+    font-style: normal
+}
+
+@font-face {
+    font-family: "Hover MS Sans Serif";
+    src: url(../fonts/ms-sans-serif/ms_sans_serif_bold.woff2) format("woff2"), url(../fonts/ms-sans-serif/ms_sans_serif_bold.woff) format("woff");
+    font-weight: bold;
+    font-style: normal
+}
+
+
+#classicMenuBar {
+    position: absolute;
+    left: 4px;
+    top: 25px;
+    height: 19px;
+    z-index: 20;
+    display: flex;
+    font-family: "Hover MS Sans Serif", "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Geneva, Arial, sans-serif;
+    font-size: 11px;
+    color: #000;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    cursor: default
+}
+
+#classicMenuBar u {
+    text-decoration: underline
+}
+
+.classicMenu {
+    position: relative
+}
+
+/* Menu titles: raised one pixel under the mouse and sunken while their menu is open, as in the
+   classic Windows look. */
+/* The box is the bar's full 19 px: a 13 px line of text with 2 px above and below it inside the
+   1 px edge, so the underlined letter sits inside the box, not on its bottom edge. Pressed, the
+   text moves 1 px down and right as Windows draws it. */
+.classicMenuTitle {
+    box-sizing: border-box;
+    height: 19px;
+    padding: 2px 6px 2px;
+    line-height: 13px;
+    border: 1px solid transparent
+}
+
+.classicMenuTitle u {
+    text-underline-offset: 1px
+}
+
+.classicMenuTitle:hover {
+    border-color: #fff #808080 #808080 #fff
+}
+
+.classicMenu.open .classicMenuTitle {
+    border-color: #808080 #fff #fff #808080;
+    padding: 3px 5px 1px 7px
+}
+
+.classicMenuList {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 19px;
+    min-width: 170px;
+    padding: 3px;
+    background: #c0c0c0;
+    border: none;
+    /* The Windows menu frame (light grey and white on the lit edges, black and dark grey on the
+       shaded ones) with the shadow Windows draws under an open menu. */
+    box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #000, inset 2px 2px 0 #fff, inset -2px -2px 0 #808080,
+        2px 2px 3px rgba(0, 0, 0, .5)
+}
+
+.classicMenu.open .classicMenuList {
+    display: block
+}
+
+.classicMenuItem {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 10px 3px 18px;
+    white-space: nowrap;
+    position: relative
+}
+
+.classicMenuItem:hover {
+    background: #000080;
+    color: #fff
+}
+
+.classicMenuItem.disabled,
+.classicMenuItem.disabled:hover {
+    background: transparent;
+    color: #808080;
+    text-shadow: 1px 1px 0 #fff
+}
+
+.classicMenuItem.checked:before {
+    content: "\2713";
+    position: absolute;
+    left: 5px
+}
+
+.classicMenuShortcut {
+    margin-left: 24px
+}
+
+.classicMenuSeparator {
+    height: 0;
+    margin: 4px 0;
+    border-top: 1px solid #808080;
+    border-bottom: 1px solid #fff
+}
+
+#classicPausedNote {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 300px;
+    z-index: 15;
+    text-align: center;
+    font-family: "Hover MS Sans Serif", "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Geneva, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000
+}
+
+/* The 1995 start-up room's "Press F2 to start a game of Hover!" box, centred on the play field
+   (the 800 x 600 view at 4, 48 in the window): a pale, slightly raised panel with large black text. */
+#classicStartNote {
+    position: absolute;
+    left: 404px;
+    top: 330px;
+    z-index: 14;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    padding: 8px 16px 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 30px;
+    line-height: 42px;
+    text-align: center;
+    white-space: nowrap;
+    color: #000;
+    /* As the 1995 box draws it: a pale panel with a white outer edge and a grey line 3 units in.
+       Sized in the game window's units, so it scales with the window like everything else. */
+    background: #f4f4f1;
+    border: 1px solid #fafafb;
+    box-shadow: inset 0 0 0 2px #f4f4f1, inset 0 0 0 3px #a09ca7;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none
+}
+
+/* Not over the "Loading..." panel: only once the room is ready. */
+#gameView:not(.ready) #classicStartNote {
+    display: none
+}
+
+#classicPausedNote span {
+    display: block;
+    margin-bottom: 8px
+}
+
+/*
+ * Dialogs laid out from their 1995 resources (resourceLayout in 22-classic-menu.js): every control
+ * sits where HOVER.EXE puts it, in dialog units converted to pixels.
+ */
+.classicDialog.resourceLayout {
+    width: auto;
+    margin-left: 0;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%)
+}
+
+.resourceLayout .classicDialogBody {
+    padding: 0;
+    line-height: 13px
+}
+
+.classicLayout {
+    position: relative
+}
+
+.classicLayout .placed {
+    position: absolute;
+    margin: 0;
+    box-sizing: border-box
+}
+
+.classicLayout .classicStatic {
+    white-space: nowrap
+}
+
+.classicLayout .classicStatic.disabled {
+    color: #808080;
+    text-shadow: 1px 1px 0 #fff
+}
+
+/* Group box: an etched frame whose top edge runs through the middle of its caption. */
+.classicGroupBox:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 6px;
+    bottom: 0;
+    border: 1px solid #808080;
+    box-shadow: inset 1px 1px 0 #fff, 1px 1px 0 #fff
+}
+
+.classicGroupLabel {
+    position: absolute;
+    left: 6px;
+    top: 0;
+    padding: 0 2px;
+    background: #c0c0c0;
+    white-space: nowrap
+}
+
+.classicLayout .classicRadio.placed,
+.classicLayout .classicCheckbox.placed {
+    display: flex;
+    align-items: center;
+    white-space: nowrap
+}
+
+.classicLayout .classicRadio.placed span,
+.classicLayout .classicCheckbox.placed span {
+    margin-left: 2px
+}
+
+.classicLayout .classicButton.placed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 0
+}
+
+.classicLayout .classicButton.placed:active {
+    padding: 2px 0 0 2px
+}
+
+/* Windows 95 option buttons and check boxes: white wells sunk two pixels into the dialog. */
+.classicDialog input[type=radio],
+.classicDialog input[type=checkbox] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: none;
+    width: 12px;
+    height: 12px;
+    margin: 0 3px 0 0;
+    background: #fff;
+    box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #000, inset -2px -2px 0 #dfdfdf;
+    outline: none
+}
+
+.classicDialog input[type=radio] {
+    border-radius: 50%
+}
+
+.classicDialog input[type=checkbox] {
+    width: 13px;
+    height: 13px
+}
+
+.classicDialog input[type=radio]:checked {
+    background: radial-gradient(circle, #000 0, #000 2px, #fff 2.5px)
+}
+
+.classicDialog input[type=checkbox]:checked {
+    background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='7' height='7' shape-rendering='crispEdges'><path fill='%23000' d='M6 0h1v3h-1zM5 1h1v3h-1zM4 2h1v3h-1zM3 3h1v3h-1zM2 4h1v3h-1zM1 3h1v3h-1zM0 2h1v3h-1z'/></svg>") no-repeat center
+}
+
+.classicDialog input[type=radio]:disabled,
+.classicDialog input[type=checkbox]:disabled {
+    background-color: #c0c0c0
+}
+
+.classicDialog input[type=radio]:disabled:checked {
+    background: radial-gradient(circle, #808080 0, #808080 2px, #c0c0c0 2.5px)
+}
+
+/* Windows 95 trackbar (slider) with ticks above and below. */
+.classicTrackChannel {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: calc(50% - 2px);
+    height: 4px;
+    background: #fff;
+    box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #000, inset -2px -2px 0 #dfdfdf
+}
+
+.classicTick {
+    position: absolute;
+    width: 1px;
+    height: 3px;
+    background: #000
+}
+
+.classicTick.top {
+    top: calc(50% - 15px)
+}
+
+.classicTick.bottom {
+    top: calc(50% + 12px)
+}
+
+.classicThumb {
+    position: absolute;
+    top: calc(50% - 10px);
+    width: 11px;
+    height: 21px;
+    margin-left: -5px;
+    background: #c0c0c0;
+    box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf
+}
+
+/* A disabled thumb is filled with the grey-and-white dither Windows uses. */
+.classicTrackbar.disabled .classicThumb {
+    background: repeating-conic-gradient(#c0c0c0 0 25%, #fff 0 50%) 0 0 / 2px 2px
+}
+
+.classicLayout .classicEdit {
+    padding: 0 3px;
+    font: inherit;
+    background: #fff;
+    border: none;
+    outline: none;
+    box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #000, inset -2px -2px 0 #dfdfdf
+}
+
+/* Windows 95 tabs (High Scores' two pages): raised tabs, the chosen one taller and joined to the page. */
+.classicTabs {
+    display: flex;
+    align-items: flex-end;
+    border-bottom: 1px solid #fff
+}
+
+.classicTab {
+    position: relative;
+    top: 1px;
+    margin-right: 1px;
+    padding: 1px 8px 2px;
+    background: #c0c0c0;
+    border: 1px solid;
+    border-color: #fff #000 transparent #fff;
+    border-radius: 3px 3px 0 0;
+    box-shadow: inset -1px 0 0 #808080
+}
+
+.classicTab.selected {
+    z-index: 1;
+    padding-top: 3px;
+    border-bottom-color: #c0c0c0
+}
+
+/* The second page's scrolling list, in a sunken white box. */
+.classicScoreList {
+    overflow-y: auto;
+    padding: 2px 4px;
+    background: #fff;
+    box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #000, inset -2px -2px 0 #dfdfdf
+}
+
+.classicScoreRow {
+    display: grid;
+    grid-template-columns: 34px 1fr 74px;
+    line-height: 16px
+}
+
+.classicScoreRow span:first-child,
+.classicScoreRow span:last-child {
+    text-align: right
+}
+
+.classicScoreRow span:nth-child(2) {
+    padding-left: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis
+}
+
+.classicScoreRow.mine {
+    font-weight: bold
+}
+
+/* "Your Scores": date, level, controls, score; your best game in bold. */
+.classicGameRow {
+    grid-template-columns: 1fr 34px 62px 64px
+}
+
+.classicGameRow span:first-child {
+    text-align: left
+}
+
+.classicGameRow span:nth-child(2) {
+    padding-left: 0;
+    text-align: right
+}
+
+.classicGameRow span:nth-child(3) {
+    padding-left: 8px
+}
+
+.classicScoreHeading {
+    border-bottom: 1px solid #808080;
+    margin-bottom: 2px
+}
+
+.classicScoreEmpty {
+    padding: 6px 2px;
+    color: #404040
+}
+
+/* Windows 95 drop-down list: a sunken white box with a raised arrow button at its right. */
+.classicLayout .classicSelect {
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0 20px 0 3px;
+    font: inherit;
+    color: #000;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    background-color: #fff;
+    background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='7' height='4' shape-rendering='crispEdges'><path fill='%23000' d='M0 0h7v1h-7zM1 1h5v1h-5zM2 2h3v1h-3zM3 3h1v1h-1z'/></svg>"),
+        linear-gradient(#c0c0c0, #c0c0c0);
+    background-repeat: no-repeat, no-repeat;
+    background-position: right 6px center, right 2px top 2px;
+    background-size: 7px 4px, 16px calc(100% - 4px);
+    box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #000, inset -2px -2px 0 #dfdfdf
+}
+
+.classicLayout .classicSelect option:disabled {
+    color: #808080
+}
+
+/* Up-down arrows beside the Start At box. */
+.classicUpDown {
+    display: flex;
+    flex-direction: column
+}
+
+.classicArrow {
+    position: relative;
+    flex: 1;
+    background: #c0c0c0;
+    box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf
+}
+
+.classicArrow:active {
+    box-shadow: inset 0 0 0 1px #808080
+}
+
+.classicArrow:after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -1px 0 0 -3px;
+    border: 3px solid transparent;
+    border-top: none
+}
+
+.classicArrow.up:after {
+    border-bottom: 3px solid #000;
+    margin-top: -2px
+}
+
+.classicArrow.down:after {
+    border-bottom: none;
+    border-top: 3px solid #000;
+    margin-top: -1px
+}
+
+/* Buttons down the right-hand side, the last one at the bottom (the 1995 Start At dialog). */
+.classicDialog.sideButtons {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    width: 340px;
+    margin-left: -170px
+}
+
+.classicDialog.sideButtons .classicDialogTitle {
+    grid-column: 1 / 3
+}
+
+.classicDialog.sideButtons .classicDialogButtons {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 14px 8px 12px 2px
+}
+
+.classicDialog.sideButtons .classicButton {
+    margin: 0 0 6px
+}
+
+.classicDialog.sideButtons .classicButton:last-child {
+    margin: auto 0 0
+}
+
+.classicDialog.wide {
+    width: 400px;
+    margin-left: -200px
+}
+
+.classicDialog {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: 320px;
+    margin-left: -160px;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    z-index: 30;
+    background: #c0c0c0;
+    border: 1px solid;
+    border-color: #dfdfdf #000 #000 #dfdfdf;
+    box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+    padding: 3px;
+    font-family: "Hover MS Sans Serif", "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Geneva, Arial, sans-serif;
+    font-size: 11px;
+    color: #000;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    cursor: default
+}
+
+/* A dialog takes the keyboard focus when it opens (so Enter and Esc reach it); Windows 95 draws no
+   focus ring round a dialog, so the browser's is hidden. */
+.classicDialog:focus,
+.classicDialog:focus-visible {
+    outline: none
+}
+
+.classicDialogTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 18px;
+    padding: 0 2px 0 4px;
+    background: #000080;
+    color: #fff;
+    font-weight: bold
+}
+
+/* The Windows 95 title-bar close button: 16 x 14 with the push button's two-pixel bevel (white and
+   light grey on the lit edges, black and dark grey on the shaded ones) and its 8 x 7 bitmap cross
+   with two-pixel strokes (the Marlett "r"), drawn 4 px in and 3 px down; pressed, the bevel turns
+   in and the cross moves 1 px down and right. Greyed out, the cross is dark grey with a white
+   copy 1 px down and right. The markup's "x" character is kept for screen readers only. */
+.classicDialogClose {
+    flex: none;
+    width: 16px;
+    height: 14px;
+    overflow: hidden;
+    font-size: 0;
+    color: transparent;
+    background: #c0c0c0 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='7' shape-rendering='crispEdges'><path fill='%23000' d='M0 0h2v1h-2zM6 0h2v1h-2zM1 1h2v1h-2zM5 1h2v1h-2zM2 2h4v1h-4zM3 3h2v1h-2zM2 4h4v1h-4zM1 5h2v1h-2zM5 5h2v1h-2zM0 6h2v1h-2zM6 6h2v1h-2z'/></svg>") no-repeat 4px 3px;
+    box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf
+}
+
+.classicDialogClose:active {
+    background-position: 5px 4px;
+    box-shadow: inset 1px 1px 0 #000, inset -1px -1px 0 #fff, inset 2px 2px 0 #808080, inset -2px -2px 0 #dfdfdf
+}
+
+.classicDialogClose.disabled {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='8' shape-rendering='crispEdges'><g fill='%23fff' transform='translate(1 1)'><path d='M0 0h2v1h-2zM6 0h2v1h-2zM1 1h2v1h-2zM5 1h2v1h-2zM2 2h4v1h-4zM3 3h2v1h-2zM2 4h4v1h-4zM1 5h2v1h-2zM5 5h2v1h-2zM0 6h2v1h-2zM6 6h2v1h-2z'/></g><path fill='%23808080' d='M0 0h2v1h-2zM6 0h2v1h-2zM1 1h2v1h-2zM5 1h2v1h-2zM2 2h4v1h-4zM3 3h2v1h-2zM2 4h4v1h-4zM1 5h2v1h-2zM5 5h2v1h-2zM0 6h2v1h-2zM6 6h2v1h-2z'/></svg>");
+    pointer-events: none
+}
+
+.classicDialogBody {
+    padding: 10px 10px 4px;
+    line-height: 1.4
+}
+
+.classicMessage .classicDialogBody {
+    padding: 0
+}
+
+.classicDialogBody p {
+    margin: 0 0 8px
+}
+
+.classicDialogBody b {
+    font-weight: bold
+}
+
+.classicDialogBody .classicNote {
+    color: #404040
+}
+
+.classicRadio,
+.classicCheckbox {
+    display: block;
+    margin: 3px 0 3px 4px
+}
+
+.classicRadio.disabled,
+.classicCheckbox.disabled,
+.classicGroup .disabled {
+    color: #808080;
+    text-shadow: 1px 1px 0 #fff
+}
+
+.classicRadio input,
+.classicCheckbox input {
+    margin: 0 3px 0 0;
+    vertical-align: -2px
+}
+
+/* The etched frame with a caption that groups a dialog's settings. */
+.classicGroup {
+    margin: 0 0 8px;
+    padding: 6px 8px 6px;
+    border: 1px solid #808080;
+    box-shadow: 1px 1px 0 #fff, inset 1px 1px 0 #fff
+}
+
+.classicGroup legend {
+    padding: 0 3px
+}
+
+.classicRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+.classicRow label + input,
+.classicDialogBody input[type=number] {
+    width: 54px;
+    margin-left: 8px;
+    padding: 2px 3px;
+    font: inherit;
+    background: #fff;
+    border: 1px solid;
+    border-color: #808080 #fff #fff #808080;
+    box-shadow: inset 1px 1px 0 #000, inset -1px -1px 0 #dfdfdf
+}
+
+.classicSettingsTable td {
+    padding: 2px 16px 2px 0
+}
+
+.classicSettingsTable select {
+    font: inherit;
+    min-width: 60px
+}
+
+.classicColumns {
+    display: flex
+}
+
+.classicColumns > div {
+    flex: 1
+}
+
+.classicColumns > div + div {
+    margin-left: 8px
+}
+
+.classicSlider {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+    color: #808080;
+    text-shadow: 1px 1px 0 #fff
+}
+
+.classicSlider span:nth-child(2) {
+    text-align: right
+}
+
+.classicSlider input {
+    grid-column: 1 / 4
+}
+
+.classicSlider span:nth-last-child(1) {
+    text-align: right;
+    grid-column: 3
+}
+
+.classicKeys td {
+    padding: 1px 12px 1px 0
+}
+
+.classicDialogButtons {
+    display: flex;
+    justify-content: flex-end;
+    padding: 6px 7px 7px
+}
+
+/* Message boxes (Windows 95 MessageBox): 75 x 23 buttons, centred, 16 px below the text and 11 px
+   above the bottom edge. */
+.classicMessage .classicDialogButtons {
+    justify-content: center;
+    padding: 16px 11px 11px
+}
+
+.classicMessage .classicButton {
+    box-sizing: border-box;
+    width: 75px;
+    height: 23px;
+    padding: 0;
+    line-height: 23px;
+    margin: 0 3px
+}
+
+.classicMessage .classicButton:active {
+    padding: 1px 0 0 1px
+}
+
+/* Windows 95 push button: white and light grey on the lit edges, black and dark grey on the shaded
+   ones. The default button has an extra black frame. */
+.classicButton {
+    min-width: 66px;
+    margin-left: 6px;
+    padding: 4px 6px;
+    text-align: center;
+    background: #c0c0c0;
+    border: none;
+    box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf
+}
+
+.classicButton.isDefault {
+    box-shadow: inset 0 0 0 1px #000, inset -2px -2px 0 #000, inset 2px 2px 0 #fff, inset -3px -3px 0 #808080, inset 3px 3px 0 #dfdfdf
+}
+
+.classicButton:active {
+    padding: 5px 5px 3px 7px;
+    box-shadow: inset 0 0 0 1px #000, inset 0 0 0 2px #808080
+}
+
+.classicButton.disabled {
+    color: #808080;
+    text-shadow: 1px 1px 0 #fff;
+    pointer-events: none
+}
+
+.classicMessage {
+    width: auto;
+    min-width: 160px;
+    max-width: 440px
+}
+
+/* Icon 11 px in from the left and top edges, text 16 px right of it; text shorter than the icon is
+   centred on it, longer text starts level with its top (as Windows 95 lays out a message box). */
+.classicMessageBody {
+    display: flex;
+    align-items: flex-start;
+    padding: 11px 18px 0 11px
+}
+
+.classicMessageText {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    white-space: pre-wrap
+}
+
+/* The Windows 95 message box icons, 32 x 32: a white speech balloon with a blue "i" (information)
+   or "?" (question). */
+.classicIcon {
+    flex: none;
+    position: relative;
+    width: 32px;
+    height: 32px;
+    margin-right: 16px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path fill='%23808080' d='M17.5 2.5C25.5 2.5 32 7.9 32 14.5s-6.5 12-14.5 12c-2 0-3.9-.3-5.6-.9L6.5 32.5l1-7.6C4.4 22.7 2.5 18.9 2.5 14.5 2.5 7.9 9.5 2.5 17.5 2.5z'/><path fill='%23fff' stroke='%23000' d='M15.5 .5C23.5 .5 30 5.9 30 12.5s-6.5 12-14.5 12c-2 0-3.9-.3-5.6-.9L4.5 30.5l1-7.6C2.4 20.7 .5 16.9.5 12.5.5 5.9 7.5.5 15.5.5z'/></svg>") no-repeat;
+    text-align: center;
+    font: bold 22px/25px "Times New Roman", serif;
+    color: #00f
+}
+
+.classicIcon-info {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path fill='%23808080' d='M17.5 2.5C25.5 2.5 32 7.9 32 14.5s-6.5 12-14.5 12c-2 0-3.9-.3-5.6-.9L6.5 32.5l1-7.6C4.4 22.7 2.5 18.9 2.5 14.5 2.5 7.9 9.5 2.5 17.5 2.5z'/><path fill='%23fff' stroke='%23000' d='M15.5 .5C23.5 .5 30 5.9 30 12.5s-6.5 12-14.5 12c-2 0-3.9-.3-5.6-.9L4.5 30.5l1-7.6C2.4 20.7 .5 16.9.5 12.5.5 5.9 7.5.5 15.5.5z'/><g fill='%2300f' shape-rendering='crispEdges'><rect x='14' y='3' width='4' height='5'/><rect x='13' y='4' width='6' height='3'/><rect x='11' y='10' width='7' height='2'/><rect x='13' y='12' width='5' height='8'/><rect x='11' y='20' width='9' height='2'/></g></svg>")
+}
+
+.classicIcon-question:before {
+    content: "?";
+    font-family: "Hover MS Sans Serif", Arial, sans-serif
+}
+
+.classicDialogTitle {
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none
+}
+
+.classicAbout {
+    display: flex
+}
+
+.classicAppIcon {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    margin: 0 14px 0 2px;
+    background: url(../Images/ui/favicon-144.2c5979ce.png) no-repeat center / contain
+}
+
+.classicAboutText hr {
+    border: none;
+    border-top: 1px solid #808080;
+    border-bottom: 1px solid #fff;
+    margin: 6px 0
+}
+
+/* The score in the dashboard's top-right box: seven 24 x 41 green LED digits, placed as the 1995
+   dashboard (DASHRES.DLL bitmap 134) draws them; the digits are its own, 0 to 9 in one strip. */
+.retro #dash_top #classicScore {
+    position: absolute;
+    left: 71.14%;
+    top: 6.96%;
+    width: 24%;
+    height: 35.65%;
+    display: flex
+}
+
+.retro #dash_top .classicScoreDigit {
+    flex: 1;
+    background: url(../Images/ui/classic-score-digits.png) no-repeat 0 0;
+    background-size: 1000% 100%;
+    image-rendering: pixelated
+}
+
+/* The rear-view mirror (Customize Game > Show Rear View) over the "HOVER 950" plate. */
+.retro #dash_top #rear_view .rearViewCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated
+}
+
+/* The classic window now fills the screen (21-fit-to-screen.js); the page footer would sit on it. */
+.view-retro #footer {
+    display: none
+}
+
+/* Embedded on another site (embed/hover-embed.js): no page footer. */
+.hover-embedded #footer {
+    display: none
+}
+
+/*
+ * Classic level loading (this edition): the game window stays on screen while a level loads, and
+ * its view shows "Loading Level N..." with the Windows 95 hourglass. #gameLoading is moved into the
+ * window by src/game/21-fit-to-screen.js; it disappears when the level is ready (#gameView.ready).
+ */
+.retro #gameContainer {
+    opacity: 1
+}
+
+.retro #gameContainer > #gameLoading {
+    position: absolute;
+    left: 4px;
+    top: 48px;
+    width: 800px;
+    height: 600px;
+    margin: 0; /* #gameLoading is also a .contentArea, which centres itself with negative margins */
+    padding: 0;
+    -webkit-transform: none;
+    transform: none;
+    z-index: 12;
+    background: #000
+}
+
+.retro #gameContainer > #gameLoading #gameLoadingText {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 262px;
+    font-family: "Hover MS Sans Serif", "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Geneva, Arial, sans-serif;
+    font-size: 22px;
+    text-transform: none;
+    color: #fff;
+    -webkit-font-smoothing: none
+}
+
+.retro #gameContainer > #gameLoading #gameLoadingGraphic {
+    top: 310px;
+    margin-top: 0;
+    -webkit-transform: scale(2);
+    transform: scale(2)
+}
